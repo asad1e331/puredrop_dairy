@@ -1,4 +1,3 @@
-
 import '../entities/delivery.dart';
 
 abstract class DeliveryRepository {
