@@ -111,3 +111,16 @@ Task 3: Security review and final handover.
 Asad Bajwa
 
 Ezitech Flutter Development Internship
+
+## Task 2 — Offline-First Data Persistence
+
+The repository fetches delivery records from the mock API and saves them locally in Hive. The dashboard watches a Riverpod stream and updates automatically when the saved records change. When Wi-Fi and mobile data are disconnected, an Offline banner appears and saved deliveries remain visible.
+
+### How to verify
+
+1. Launch the app online and wait for the seven deliveries to load.
+2. Close the app completely, turn off Wi-Fi and mobile data, and reopen it.
+3. Confirm that the same deliveries and the Offline banner are visible.
+4. Reconnect and confirm that the banner disappears and refresh starts automatically.
+
+Run `flutter test` to verify Hive persistence and dashboard updates.
