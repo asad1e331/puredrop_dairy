@@ -30,10 +30,13 @@ void main() {
 
     expect(find.text("You're Offline"), findsOneWidget);
     expect(find.text('No cached deliveries available'), findsOneWidget);
-    expect(
-      tester.widget<IconButton>(find.byTooltip('Refresh deliveries')).onPressed,
-      isNull,
+    final refreshButton = find.byWidgetPredicate(
+      (widget) =>
+          widget is IconButton && widget.tooltip == 'Refresh deliveries',
     );
+
+    expect(refreshButton, findsOneWidget);
+    expect(tester.widget<IconButton>(refreshButton).onPressed, isNull);
 
     updates.add([
       Delivery(
