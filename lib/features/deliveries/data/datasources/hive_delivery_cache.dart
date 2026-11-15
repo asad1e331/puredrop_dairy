@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:hive/hive.dart';
 
 import '../../domain/entities/delivery.dart';
+import '../models/delivery_codec.dart';
 
 class HiveDeliveryCache {
   static const String deliveriesKey = 'weekly_deliveries';
@@ -18,30 +19,30 @@ class HiveDeliveryCache {
       return [];
     }
 
-    final decoded = jsonDecode(storedData) as List<dynamic>;
+    final Object? decoded;
+    try {
+      decoded = jsonDecode(storedData);
+    } on FormatException {
+      return [];
+    }
 
-    return decoded.map((item) {
-      final map = Map<String, dynamic>.from(item as Map);
+    if (decoded is! List) {
+      return [];
+    }
 
-      return Delivery(
-        id: map['id'] as String,
-        date: DateTime.parse(map['date'] as String),
-        status: DeliveryStatus.values.byName(map['status'] as String),
-        quantity: (map['quantity'] as num).toDouble(),
-      );
-    }).toList();
+    final deliveries = <Delivery>[];
+    for (final record in decoded) {
+      try {
+        deliveries.add(DeliveryCodec.decode(record));
+      } on FormatException {
+        continue;
+      }
+    }
+    return deliveries;
   }
 
   Future<void> saveDeliveries(List<Delivery> deliveries) async {
-    final data = deliveries.map((delivery) {
-      return {
-        'id': delivery.id,
-        'date': delivery.date.toIso8601String(),
-        'status': delivery.status.name,
-        'quantity': delivery.quantity,
-      };
-    }).toList();
-
+    final data = deliveries.map(DeliveryCodec.encode).toList();
     await _box.put(deliveriesKey, jsonEncode(data));
   }
 
