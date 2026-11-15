@@ -1,126 +1,57 @@
-
 # PureDrop Dairy
 
-A Flutter-based milk delivery tracking application developed as part of the Ezitech Flutter Development Internship.
+I built this Flutter app for my Ezitech internship. The dashboard shows seven days of sample milk deliveries, including the date, quantity, and delivery status.
 
-## Task 1: Core Architecture & Subscription Dashboard
+## How the app works
 
-This task focuses on building a scalable application foundation using Clean Architecture and Riverpod dependency injection.
+The domain layer defines the `Delivery` model and the repository contract. The data layer handles the mock API and the Hive cache. The presentation layer displays the delivery list and handles loading, empty, and error states.
 
-## Features
+When the app fetches deliveries, the repository saves them in Hive. The dashboard watches a Riverpod stream, so the list updates when the cache changes. If the device loses its network connection, the app shows an offline banner and keeps the saved deliveries visible. When the connection returns, the app refreshes automatically.
 
-- Responsive customer dashboard
-- Seven days of sample milk delivery records
-- Delivered and Pending status badges
-- Milk quantity and delivery date
-- Active subscription display (mock)
-- Loading, error, and empty states
-- Reusable Flutter widgets
+See the [Technical Decision Log](DECISIONS.md) for why I chose Riverpod over Provider or BLoC for this project.
 
-## Technologies
+## Run on Android
 
-- Flutter and Dart
-- Riverpod
-- Google Fonts
-- Material Design 3
+Install Flutter and the Android SDK. Connect an Android phone with USB debugging enabled or start an emulator. Then run these commands from the project folder.
 
-## Architecture
 
-The application follows three separate layers:
+flutter pub get
+flutter run
 
-### Domain
-Contains delivery entities and repository contracts.
 
-### Data
-Contains the mock delivery service, repository implementation, and Riverpod providers.
+## Run tests
 
-### Presentation
-Contains dashboard screens and reusable UI widgets.
 
-Data flow:
+flutter analyze
+flutter test
 
-Dashboard -> Riverpod Provider -> DeliveryRepository -> MockDeliveryRepository -> MockDeliveryService
+The tests cover valid, missing, and invalid values in `Delivery` and `Message` records. They also check that Hive records survive closing and reopening the box and that the dashboard updates when the delivery stream changes.
 
-The dashboard does not directly access the mock service.
+### Check offline behavior
 
-## Setup
+1. Open the app while connected and wait for the deliveries to load.
+2. Close the app completely, turn off Wi-Fi and mobile data, and open it again.
+3. Check that the saved deliveries and the **You're Offline** banner appear.
+4. Reconnect and check that the banner disappears.
 
-1. Install Flutter SDK.
-2. Clone the repository.
-3. Open the project directory.
-4. Install dependencies:
+## Build and install the APK
 
-   flutter pub get
 
-5. Run the Android application:
+flutter build apk --release
 
-   flutter run
 
-## Testing
+The APK is saved at `build/app/outputs/flutter-apk/app-release.apk`. With an Android device connected over USB, install it using:
 
-Run static analysis:
 
-   flutter analyze
+adb install -r build/app/outputs/flutter-apk/app-release.apk
 
-Run automated tests:
 
-   flutter test
+The current Gradle setup uses a debug signing key for this test APK. Client distribution requires a client-owned release key.
 
-## Deployment
+## Current scope
 
-For an Android release build:
-
-   flutter build apk --release
-
-The generated APK can be found in:
-
-   build/app/outputs/flutter-apk/app-release.apk
-
-Production deployment requires app signing and release configuration.
-
-## Technical Decision Log
-
-### Why Riverpod?
-
-Riverpod was selected for dependency injection and asynchronous state management.
-
-The repository provider is declared in the data layer and exposes the domain repository contract.
-
-This allows the mock repository to be replaced by an offline persistence implementation without rewriting the dashboard.
-
-### Why Clean Architecture?
-
-Clean Architecture separates business logic from Flutter widgets, improves testability, and supports future features.
-
-### Why ListView.builder?
-
-ListView.builder efficiently creates visible delivery cards and supports scalable lists.
-
-### Why MediaQuery?
-
-MediaQuery provides screen dimensions in logical pixels, helping adapt the layout to different screen sizes and densities.
-
-## Future Tasks
-
-Task 2: Offline-first data persistence.
-
-Task 3: Security review and final handover.
+Deliveries and subscription details use sample data. The Hive cache is unencrypted and stores sample deliveries. The `Message` model has parsing tests. Live support chat is still pending.
 
 ## Author
 
-Asad Bajwa
-
-Ezitech Flutter Development Internship
-
-## Task 2 — Offline-First Data Persistence
-
-The repository fetches delivery records from the mock API and saves them locally in Hive. The dashboard watches a Riverpod stream and updates automatically when the saved records change. When Wi-Fi and mobile data are disconnected, an Offline banner appears and saved deliveries remain visible.
-
-### How to verify
-
-1. Launch the app online and wait for the seven deliveries to load.
-2. Close the app completely, turn off Wi-Fi and mobile data, and reopen it.
-3. Confirm that the same deliveries and the Offline banner are visible.
-4. Reconnect and confirm that the banner disappears and refresh starts automatically.
-
-Run `flutter test` to verify Hive persistence and dashboard updates.
+Asad Bajwa  
