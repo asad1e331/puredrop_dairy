@@ -11,4 +11,14 @@ class MockDeliveryRepository implements DeliveryRepository {
   Future<List<Delivery>> getWeeklyDeliveries() {
     return _service.fetchWeeklyDeliveries();
   }
+
+  @override
+  Stream<List<Delivery>> watchWeeklyDeliveries() async* {
+    yield await getWeeklyDeliveries();
+  }
+
+  @override
+  Future<void> refreshDeliveries() async {
+    await _service.fetchWeeklyDeliveries();
+  }
 }
